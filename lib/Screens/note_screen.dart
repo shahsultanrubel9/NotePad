@@ -32,28 +32,121 @@ class NoteScreen extends StatelessWidget {
         child: Icon(Icons.add),
       ),
 
-      ///==============Body GetBuilder=======================
+      ///==============Body Start GetBuilder=======================
       body: GetBuilder<NoteController>(
         builder: (_) {
-          return ListView.builder(
-              shrinkWrap: true,
-              itemCount: noteController.notes.length,
-              itemBuilder: (context, index) {
-                return Card(
-                  child: ListTile(
-                    leading: Text(noteController.notes[index].id),
-                    title: Text(noteController.notes[index].name),
-                    subtitle: Text(noteController.notes[index].department),
-                  ),
-                );
-              });
+          return Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: ListView.builder(
+                shrinkWrap: true,
+                itemCount: noteController.notes.length,
+                itemBuilder: (context, index) {
+                  return Card(
+                    child: ListTile(
+                      leading: Text(noteController.notes[index].id),
+                      title: Text(noteController.notes[index].name),
+                      subtitle: Text(noteController.notes[index].department),
+
+                      ///=======15 Lecture Icons===============
+                      trailing: Container(
+                        width: 100.0,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            InkWell(
+                              onTap: () {
+                                _showUpdateDialogue(context, index);
+                              },
+                              child: Icon(Icons.edit),
+                            ),
+                            InkWell(
+                              onTap: () {
+                                noteController.deleteNote(index);
+                              },
+                              child: Icon(
+                                Icons.delete,
+                                color: Colors.deepOrange,
+                              ),
+                            )
+                          ],
+                        ),
+                      ),
+                    ),
+                  );
+                }),
+          );
         },
       ),
+
+      //==================End Body===================
     );
   }
 
-  ///==================showDialogu=========================
+  ///==================showDialogu Start=========================
 
+  _showUpdateDialogue(BuildContext context, int index) {
+    return showDialog(
+        context: context,
+        builder: (_) {
+          return Center(
+            child: SingleChildScrollView(
+              child: AlertDialog(
+                content: Column(
+                  children: [
+                    TextField(
+                      controller: idClt,
+                      decoration: InputDecoration(hintText: 'Student Id'),
+                    ),
+                    SizedBox(height: 10.0),
+                    TextField(
+                      controller: nameClt,
+                      decoration: InputDecoration(hintText: 'Student Name'),
+                    ),
+                    SizedBox(height: 10.0),
+                    TextField(
+                      controller: deptClt,
+                      decoration:
+                          InputDecoration(hintText: 'Student Department'),
+                    )
+                  ],
+                ),
+                actions: [
+                  //================Cancel Button======================================
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    child: Text(
+                      'Cancel',
+                      style: TextStyle(color: Colors.white),
+                    ),
+                    style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.deepOrange),
+                  ),
+                  //================Submit Button=====================================
+                  ElevatedButton(
+                    onPressed: () {
+                      noteController.updateNote(
+                          NoteModel(idClt.text, nameClt.text, deptClt.text),
+                          index);
+                      Navigator.pop(context);
+                    },
+                    child: Text(
+                      'Update',
+                      style: TextStyle(color: Colors.white),
+                    ),
+                    style:
+                        ElevatedButton.styleFrom(backgroundColor: brownColor),
+                  ),
+                ],
+              ),
+            ),
+          );
+        });
+  }
+  //========================ShowDialauge End=====================
+
+  ///==================showDialogu Start=========================
   _showDialogue(BuildContext context) {
     return showDialog(
         context: context,
@@ -113,4 +206,5 @@ class NoteScreen extends StatelessWidget {
           );
         });
   }
+  //========================ShowDialauge End===============
 }

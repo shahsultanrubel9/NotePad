@@ -8,4 +8,14 @@ class NoteController extends GetxController {
     notes.add(note);
     update();
   }
+
+  void updateNote(NoteModel note, int index) {
+    notes[index] = note;
+    update();
+  }
+
+  void deleteNote(int index) {
+    notes.removeAt(index);
+    update();
+  }
 }
