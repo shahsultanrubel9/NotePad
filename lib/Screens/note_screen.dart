@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_application_14/Controllers/note_controller.dart';
 import 'package:flutter_application_14/Models/note_models.dart';
 import 'package:get/get.dart';
+import 'package:hive/hive.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 
 class NoteScreen extends StatelessWidget {
   NoteScreen({super.key});
@@ -15,6 +17,8 @@ class NoteScreen extends StatelessWidget {
 
   NoteController noteController =
       Get.put(NoteController()); //Model Class Controller
+
+  final Box box = Hive.box('notes');
 
   @override
   Widget build(BuildContext context) {
@@ -37,42 +41,49 @@ class NoteScreen extends StatelessWidget {
         builder: (_) {
           return Padding(
             padding: const EdgeInsets.all(8.0),
-            child: ListView.builder(
-                shrinkWrap: true,
-                itemCount: noteController.notes.length,
-                itemBuilder: (context, index) {
-                  return Card(
-                    child: ListTile(
-                      leading: Text(noteController.notes[index].id),
-                      title: Text(noteController.notes[index].name),
-                      subtitle: Text(noteController.notes[index].department),
+            child: ValueListenableBuilder(
+                valueListenable: box.listenable(),
+                builder: (context, box, child) {
+                  return ListView.builder(
+                      shrinkWrap: true,
+                      itemCount: box.keys.length,
+                      itemBuilder: (context, index) {
+                        NoteModel note = box.getAt(index);
 
-                      ///=======15 Lecture Icons===============
-                      trailing: Container(
-                        width: 100.0,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            InkWell(
-                              onTap: () {
-                                _showUpdateDialogue(context, index);
-                              },
-                              child: Icon(Icons.edit),
-                            ),
-                            InkWell(
-                              onTap: () {
-                                noteController.deleteNote(index);
-                              },
-                              child: Icon(
-                                Icons.delete,
-                                color: Colors.deepOrange,
+                        return Card(
+                          child: ListTile(
+                            leading: Text(note.id),
+                            title: Text(note.name),
+                            subtitle: Text(note.department),
+
+                            ///=======15 Lecture Icons===============
+                            trailing: Container(
+                              width: 100.0,
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  InkWell(
+                                    onTap: () {
+                                      _showUpdateDialogue(context, index);
+                                    },
+                                    child: Icon(Icons.edit),
+                                  ),
+                                  InkWell(
+                                    onTap: () {
+                                      noteController.deleteNote(index);
+                                    },
+                                    child: Icon(
+                                      Icons.delete,
+                                      color: Colors.deepOrange,
+                                    ),
+                                  )
+                                ],
                               ),
-                            )
-                          ],
-                        ),
-                      ),
-                    ),
-                  );
+                            ),
+                          ),
+                        );
+                      });
                 }),
           );
         },
